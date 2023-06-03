@@ -10,13 +10,19 @@ speaker = wespeaker.Speaker(lang='en')
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/upload")
+@app.post("/upload")
 async def upload_file(file: UploadFile ):
-    file_path = f"/assets/{file.filename}"
+    print("here in backend upload")
+    print("printing uploaded filename", file.filename)
+    file_path = f"./assets/{file.filename}"
 
     # Save the uploaded file to a temporary folder
     print("File uploading...")
     # temp_file = "/assets/uploaded_file.m4a"
+    if not os.path.exists(file_path):
+        with open(file_path, "xb"):
+            pass
+
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
     print("File uploaded:", file.filename)
@@ -27,9 +33,11 @@ async def upload_file(file: UploadFile ):
 async def compute_cosine_score(wav_file: UploadFile = File(...),wav_file_1: UploadFile = File(...)):
     # 保存上传的文件到临时文件夹
     print("file reading...")
-    with open("temp.wav", "wb") as buffer:
+    with open("./assets/abc.wav", "wb") as buffer:
+    # with open("temp.wav", "wb") as buffer:
         buffer.write(wav_file.file.read())
-    with open("temp1.wav", "wb") as buffer:
+    with open("./assets/heeju.wav", "wb") as buffer:
+    # with open("temp1.wav", "wb") as buffer:
         buffer.write(wav_file_1.file.read())
     print("calculating...")
     # 计算相似度得分
