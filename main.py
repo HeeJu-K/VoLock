@@ -9,6 +9,20 @@ speaker = wespeaker.Speaker(lang='en')
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+@app.get("/upload")
+async def upload_file(file: UploadFile ):
+    file_path = f"/assets/{file.filename}"
+
+    # Save the uploaded file to a temporary folder
+    print("File uploading...")
+    # temp_file = "/assets/uploaded_file.m4a"
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+    print("File uploaded:", file.filename)
+
+    return {"filename": file.filename, "message": "File uploaded successfully."}
+
 @app.post("/cosine_score")
 async def compute_cosine_score(wav_file: UploadFile = File(...),wav_file_1: UploadFile = File(...)):
     # 保存上传的文件到临时文件夹
