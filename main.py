@@ -34,6 +34,34 @@ async def upload_file(file: UploadFile ):
 
     return {"filename": file.filename, "message": "File uploaded successfully."}
 
+@app.post("/get_score")
+async def get_cosine_score(file: UploadFile):
+    tmp_file_path = f"./esp/espRecording.wav"
+    if not os.path.exists(tmp_file_path):
+        with open(tmp_file_path, "xb"):
+            pass
+
+    with open(tmp_file_path, "wb") as buffer:
+        buffer.write(await file.read())
+        
+    directory = "./assets"
+    wav_files = [file for file in directory if file.endswith(".wav")]
+    score = 0
+    # Go through each WAV file
+    for wav_file in wav_files:
+        file_path = os.path.join(directory, wav_file)
+        emb1 = speaker.extract_embedding(tmp_file_path)[0]
+        emb2 = speaker.extract_embedding(file_path)[0]
+        score = speaker.compute_cosine_score(emb1, emb2)
+        print("first score", score)
+        if score>0.6:
+            break
+    
+    return str(score)
+    
+    # Open the WAV file
+    # with wave.open(file_path, 'rb') as wav:
+
 @app.get("/cosine_score")
 async def compute_cosine_score():
     # 保存上传的文件到临时文件夹
