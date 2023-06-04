@@ -3,9 +3,48 @@ import os
 import wespeakerruntime as wespeaker
 import uvicorn
 import ffmpeg
+import requests
+
 
 app = FastAPI()
 speaker = wespeaker.Speaker(lang='en')
+
+
+def compute_score():
+    url = "http://10.155.234.136/recording.wav"
+    tmp_file_path = f"./esp/espRecording.wav"
+    if not os.path.exists(tmp_file_path):
+        with open(tmp_file_path, "xb"):
+            pass
+    response = requests.get(url)
+    if response.status_code == 200:
+    # Request was successful
+        with open(tmp_file_path, 'wb') as file:
+            file.write(response.content)
+        print("File saved successfully.")
+    else:
+            # Request failed
+        print("Error:", response.status_code)
+
+    print("file is made")    
+    directory = "./assets"
+    # wav_files = [file for file in directory if file.endswith(".wav")]
+    wav_files = os.listdir(directory)
+    print("wav files", wav_files)
+    score = 0
+    # Go through each WAV file
+    for wav_file in wav_files:
+        print("in for loop")
+        file_path = os.path.join(directory, wav_file)
+        emb1 = speaker.extract_embedding("./esp/espRecording.wav")[0]
+        emb2 = speaker.extract_embedding(file_path)[0]
+        score = speaker.compute_cosine_score(emb1, emb2)
+        print("first score", score)
+        if score>0.6:
+            break
+    
+    return str(score)
+
 
 @app.get("/")
 def read_root():
@@ -65,6 +104,10 @@ async def get_cosine_score(file: UploadFile):
     
     # Open the WAV file
     # with wave.open(file_path, 'rb') as wav:
+
+@app.get("/request")
+def handleFile():
+    return compute_score()
 
 @app.get("/cosine_score")
 async def compute_cosine_score():
