@@ -36,6 +36,7 @@ async def upload_file(file: UploadFile ):
 
 @app.post("/get_score")
 async def get_cosine_score(file: UploadFile):
+    print("in get score")
     tmp_file_path = f"./esp/espRecording.wav"
     if not os.path.exists(tmp_file_path):
         with open(tmp_file_path, "xb"):
@@ -43,14 +44,17 @@ async def get_cosine_score(file: UploadFile):
 
     with open(tmp_file_path, "wb") as buffer:
         buffer.write(await file.read())
-        
+    print("file is made")    
     directory = "./assets"
-    wav_files = [file for file in directory if file.endswith(".wav")]
+    # wav_files = [file for file in directory if file.endswith(".wav")]
+    wav_files = os.listdir(directory)
+    print("wav files", wav_files)
     score = 0
     # Go through each WAV file
     for wav_file in wav_files:
+        print("in for loop")
         file_path = os.path.join(directory, wav_file)
-        emb1 = speaker.extract_embedding(tmp_file_path)[0]
+        emb1 = speaker.extract_embedding("./esp/espRecording.wav")[0]
         emb2 = speaker.extract_embedding(file_path)[0]
         score = speaker.compute_cosine_score(emb1, emb2)
         print("first score", score)
