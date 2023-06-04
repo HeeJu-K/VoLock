@@ -34,24 +34,24 @@ async def upload_file(file: UploadFile ):
 
     return {"filename": file.filename, "message": "File uploaded successfully."}
 
-@app.post("/cosine_score")
-async def compute_cosine_score(wav_file: UploadFile = File(...),wav_file_1: UploadFile = File(...)):
+@app.get("/cosine_score")
+async def compute_cosine_score():
     # 保存上传的文件到临时文件夹
     print("file reading...")
-    with open("./assets/abc.wav", "wb") as buffer:
+    #with open("./assets/abc.wav", "wb") as buffer:
     # with open("temp.wav", "wb") as buffer:
-        buffer.write(wav_file.file.read())
-    with open("./assets/heeju.wav", "wb") as buffer:
+    #    buffer.write(wav_file.file.read())
+    #with open("./assets/heeju.wav", "wb") as buffer:
     # with open("temp1.wav", "wb") as buffer:
-        buffer.write(wav_file_1.file.read())
-    print("calculating...")
+        #buffer.write(wav_file_1.file.read())
+    #print("calculating...")
     # 计算相似度得分
-    emb1 = speaker.extract_embedding("temp.wav")[0]
-    emb2 = speaker.extract_embedding("temp1.wav")[0]
+    emb1 = speaker.extract_embedding("./assets/heeju.wav")[0]
+    emb2 = speaker.extract_embedding("./assets/abc.wav")[0]
     score = speaker.compute_cosine_score(emb1, emb2)
 
     # 删除临时文件
-    os.remove("temp.wav")
+    #os.remove("temp.wav")
 
     return str(score)
 
