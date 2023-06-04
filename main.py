@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 import os
 import wespeakerruntime as wespeaker
 import uvicorn
+import ffmpeg
 
 app = FastAPI()
 speaker = wespeaker.Speaker(lang='en')
@@ -14,17 +15,21 @@ def read_root():
 async def upload_file(file: UploadFile ):
     print("here in backend upload")
     print("printing uploaded filename", file.filename)
-    file_path = f"./assets/{file.filename}"
+    tmp_file_path = f"./assets/{file.filename}"
+    output_file_path = os.path.splitext(tmp_file_path)[0] + ".wav"
 
     # Save the uploaded file to a temporary folder
     print("File uploading...")
     # temp_file = "/assets/uploaded_file.m4a"
-    if not os.path.exists(file_path):
-        with open(file_path, "xb"):
+    if not os.path.exists(tmp_file_path):
+        with open(tmp_file_path, "xb"):
             pass
 
-    with open(file_path, "wb") as buffer:
+    with open(tmp_file_path, "wb") as buffer:
         buffer.write(await file.read())
+
+    ffmpeg.input(tmp_file_path).output(output_file_path).run()
+    os.remove(tmp_file_path)
     print("File uploaded:", file.filename)
 
     return {"filename": file.filename, "message": "File uploaded successfully."}
