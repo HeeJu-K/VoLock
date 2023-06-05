@@ -4,13 +4,20 @@ import wespeakerruntime as wespeaker
 import uvicorn
 import ffmpeg
 import requests
+import time
+import asyncio
+
 
 
 app = FastAPI()
 speaker = wespeaker.Speaker(lang='en')
 
+async def repeat():
+    while True:
+        await compute_score()
+        await asyncio.sleep(1)
 
-def compute_score():
+async def compute_score():
     url = "http://10.155.234.136/recording.wav"
     tmp_file_path = f"./esp/espRecording.wav"
     if not os.path.exists(tmp_file_path):
@@ -18,17 +25,17 @@ def compute_score():
             pass
     response = requests.get(url)
     if response.status_code == 200:
-    # Request was successful
+        # Request was successful
         with open(tmp_file_path, 'wb') as file:
             file.write(response.content)
         print("File saved successfully.")
     else:
-            # Request failed
+        # Request failed
         print("Error:", response.status_code)
+        return
 
     print("file is made")    
     directory = "./assets"
-    # wav_files = [file for file in directory if file.endswith(".wav")]
     wav_files = os.listdir(directory)
     print("wav files", wav_files)
     score = 0
@@ -132,3 +139,5 @@ async def compute_cosine_score():
 
 if __name__ == "__main__":
     uvicorn.run(app,port=5556,host="0.0.0.0")
+    asyncio.run(repeat())
+
