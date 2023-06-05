@@ -13,17 +13,22 @@ app = FastAPI()
 speaker = wespeaker.Speaker(lang='en')
 
 async def repeat():
+    print("in repeat")
     while True:
         await compute_score()
+        print("repeated once")
         await asyncio.sleep(1)
 
 async def compute_score():
+    print("here in compute score")
     url = "http://10.155.234.136/recording.wav"
     tmp_file_path = f"./esp/espRecording.wav"
     if not os.path.exists(tmp_file_path):
         with open(tmp_file_path, "xb"):
             pass
-    response = requests.get(url)
+    print("before request")
+    response = await  requests.get(url)
+    print("here")
     if response.status_code == 200:
         # Request was successful
         with open(tmp_file_path, 'wb') as file:
@@ -113,8 +118,8 @@ async def get_cosine_score(file: UploadFile):
     # with wave.open(file_path, 'rb') as wav:
 
 @app.get("/request")
-def handleFile():
-    return compute_score()
+async def handleFile():
+    return await compute_score()
 
 @app.get("/cosine_score")
 async def compute_cosine_score():
@@ -137,7 +142,15 @@ async def compute_cosine_score():
 
     return str(score)
 
+#async def run_uvicorn():
+#    uvicorn.run(app, port=5556, host="0.0.0.0")
+
+#async def two_tasks():
+#    task1 = asyncio.create_task(run_uvicorn())
+#    task2 = asyncio.create_task(repeat())
+#    await asyncio.gather(task1, task2)
+
 if __name__ == "__main__":
     uvicorn.run(app,port=5556,host="0.0.0.0")
-    asyncio.run(repeat())
+    # asyncio.run(two_tasks())
 
