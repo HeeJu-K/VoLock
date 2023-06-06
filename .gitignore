@@ -19,6 +19,9 @@ project.lock.json
 /secrets
 /data
 .secrets
+host.json
+nohup.out
+VoLock-VM_key.pem
 appsettings.json
 local.settings.json
 

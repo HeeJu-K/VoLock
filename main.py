@@ -4,20 +4,19 @@ import wespeakerruntime as wespeaker
 import uvicorn
 import ffmpeg
 import requests
-import time
-import asyncio
+# import asyncio
 
 
 
 app = FastAPI()
 speaker = wespeaker.Speaker(lang='en')
 
-async def repeat():
-    print("in repeat")
-    while True:
-        await compute_score()
-        print("repeated once")
-        await asyncio.sleep(1)
+# async def repeat():
+#     print("in repeat")
+#     while True:
+#         await compute_score()
+#         print("repeated once")
+#         await asyncio.sleep(1)
 
 async def compute_score():
     print("here in compute score")
